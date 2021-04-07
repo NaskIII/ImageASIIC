@@ -34,7 +34,7 @@ class Database(object):
             sys.stdout.flush()
 
     def createDatabase(self):
-        query = 'CREATE DATABASE IF NOT EXISTS imagens_melanoma;'
+        query = 'CREATE DATABASE IF NOT EXISTS %s;' % self.database
         self.cursor.execute(query)
         self.cursor.close()
         self.mydb.close()
@@ -55,7 +55,6 @@ class Database(object):
     def insertData(self):
         cont = 0
         with open(self.path + '\\' + 'melanoma_dados.csv') as csv_file:
-
              csv_reader = csv.DictReader(
              csv_file, fieldnames=["id", "name", "benign_malignant", "diagnosis"])
 
