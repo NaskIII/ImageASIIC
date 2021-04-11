@@ -5,9 +5,7 @@ import sys
 
 
 class Dados(object):
-    def __init__(self, path, image):
-        self.path = path
-        self.image = int(image)
+    def __init__(self):
         self.idImage = []
 
     def progress_bar(self, value, max, barsize):
@@ -24,24 +22,36 @@ class Dados(object):
             sys.stdout.write("[%3i%%]\r" % percent)
             sys.stdout.flush()
 
-    def requestImageList(self):
-        req = requests.get('https://isic-archive.com/api/v1/image?limit=%s&offset=0&sort=name' % self.image)
+    def requestImageList(self, images):
+        req = requests.get('https://isic-archive.com/api/v1/image?limit=%s&offset=0&sort=name' % images)
         return req.json()
     
-    def downloadImage(self, imageListJson):
+    def requestImageSegmentationId(self, id):
+        req = requests.get('https://isic-archive.com/api/v1/segmentation?imageId=%s' % (id))
+        return req.json()
+    
+    def downloadSegmentation(self, imageListJson, path, images):
         cont = 0
         for imageData in imageListJson:
-            urlRequest.urlretrieve('https://isic-archive.com/api/v1/image/%s/download' % imageData['_id'], self.path + '\\' + imageData['name'] + '.jpg')
+            segmentationId = self.requestImageSegmentationId(imageData['_id'])
+            urlRequest.urlretrieve('https://isic-archive.com/api/v1/segmentation/%s/mask' % (segmentationId[0]['_id']), path + '\\' + imageData['name'] + '.png')
             cont+= 1
-            self.progress_bar(cont, self.image, 40)
+            self.progress_bar(cont, images, 40)
+
+    def downloadImage(self, imageListJson, path, images):
+        cont = 0
+        for imageData in imageListJson:
+            urlRequest.urlretrieve('https://isic-archive.com/api/v1/image/%s/download' % imageData['_id'], path + '\\' + imageData['name'] + '.jpg')
+            cont+= 1
+            self.progress_bar(cont, images, 40)
             self.idImage.append(imageData['_id'])
     
     def requestImageData(self, idImage):
         req = requests.get('https://isic-archive.com/api/v1/image/%s' % idImage)
         return req.json()
 
-    def writeCsv(self):
-        with open(self.path + '\\' + 'melanoma_dados.csv', 'w', newline='') as csv_file:
+    def writeCsv(self, path):
+        with open(path + '\\' + 'melanoma_dados.csv', 'w', newline='') as csv_file:
             fieldnames = ["id", "name", "benign_malignant", "diagnosis"]
             writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
             writer.writeheader()

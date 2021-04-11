@@ -4,38 +4,23 @@ import Database
 
 
 def main():
-    if len(sys.argv) < 6:
-        help()
-    else:
-        dados = Dados.Dados(
-            sys.argv[1], sys.argv[6])
+    dados = Dados.Dados()
 
-        imageListJson = dados.requestImageList()
-        dados.downloadImage(imageListJson)
-        dados.writeCsv()
+    imageListJson = dados.requestImageList(100)
+    dados.downloadSegmentation(
+        imageListJson, r'C:\Users\rapha\Documents\ISIIC_Download_Segmentation', 100)
+    dados.downloadImage(
+        imageListJson, r'C:\Users\rapha\Documents\ISIC-download', 100)
+    dados.writeCsv(r'C:\Users\rapha\Documents\ISIC-download')
 
-        database = Database.Database(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[1], sys.argv[6])
+    # database = Database.Database(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[1], sys.argv[6])
 
-        database.createDatabase()
-        database.changeDB()
-        database.createTable()
-        database.insertData()
+    # database.createDatabase()
+    # database.changeDB()
+    # database.createTable()
+    # database.insertData()
 
-        print('Done')
-
-def help():
-    print('''
-        Este script necessita de 5 argumentos sendo eles na seguinte ordem.
-        
-        Caminho: onde as imagens deverão ser guardadas após o download;
-        host: endereço do banco de dados;
-        user: usuário do banco de dados;
-        password: senha do banco de dados;
-        database: nome do banco de dados;
-        imagens: número de imagens que o script irá trazer.
-
-        O script criará um banco de dados e uma tabela. Ele também irá popular ela com os dados recebidos da plataforma ISIIC.
-        ''')
+    print('Done')
 
 
 if __name__ == '__main__':
