@@ -28,13 +28,16 @@ class Dados(object):
     
     def requestImageSegmentationId(self, id):
         req = requests.get('https://isic-archive.com/api/v1/segmentation?imageId=%s' % (id))
-        return req.json()
+        req = req.json()
+        for imageExpert in req:
+            if imageExpert['skill'] == 'expert':
+                return imageExpert
     
     def downloadSegmentation(self, imageListJson, path, images):
         cont = 0
         for imageData in imageListJson:
             segmentationId = self.requestImageSegmentationId(imageData['_id'])
-            urlRequest.urlretrieve('https://isic-archive.com/api/v1/segmentation/%s/mask' % (segmentationId[0]['_id']), path + '\\' + imageData['name'] + '.png')
+            urlRequest.urlretrieve('https://isic-archive.com/api/v1/segmentation/%s/mask' % (segmentationId['_id']), path + '\\' + imageData['name'] + '.png')
             cont+= 1
             self.progress_bar(cont, images, 40)
 
