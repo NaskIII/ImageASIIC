@@ -32,6 +32,7 @@ class Dados(object):
         for imageExpert in req:
             if imageExpert['skill'] == 'expert':
                 return imageExpert
+        return req[0]
     
     def downloadSegmentation(self, imageListJson, path, images):
         cont = 0
